@@ -4,6 +4,18 @@
 <style>
     /* existing styles... */
 
+    .logo-header img {
+        max-height: 60px;  /* limit image height */
+        width: auto;
+        margin-left: 5px;
+        display: block;
+    }
+
+    a.button-link {
+        text-decoration: none; /* remove underline on link */
+        display: inline-block;
+    }
+
     button {
         max-width: 400px;
         font-family: -apple-system, 'SF Pro';
@@ -19,6 +31,7 @@
         display: block;
         margin-top: 20px;
         font-weight: normal; /* default */
+        cursor: pointer;
     }
 
     button.bold {
@@ -28,8 +41,6 @@
     button:hover {
         background-color: #688FE5;
         border-color: #688FE5;
-        cursor: pointer;
-        transition: background-color 0.3s ease;
     }
 
     /* other styles... */
@@ -47,7 +58,7 @@
         <button type="submit" class="bold">Find</button>
     </form>
 
-    <a href="/"><button type="button" class="bold">Go Back</button></a>
+    <a href="/" class="button-link"><button type="button" class="bold">Go Back</button></a>
 </div>
 
 {% if searched %}
