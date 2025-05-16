@@ -21,16 +21,19 @@
         color: #7ABDE5;
         text-shadow: 0px 0px 5px rgba(104, 143, 229, 0.5);
     }
-    h2{
+
+    h2 {
         text-align: center;
         font-family: -apple-system, 'SF Pro';
         margin-top: 40px;
         color: #7ABDE5;
     }
+
     .form-wrapper {
         text-align: center;
         margin-top: 20px;
     }
+
     .form-wrapper a {
         text-decoration: none;
     }
@@ -103,6 +106,13 @@
         color: white;
     }
 
+    .no-results {
+        text-align: center;
+        font-family: -apple-system, 'SF Pro';
+        font-weight: bold;
+        margin-top: 30px;
+        color: #444;
+    }
 </style>
 
 <div class="logo-header">
@@ -141,14 +151,4 @@
                 <td>{{ patient.address }}</td>
                 <td>
                     <form action="/remove/{{ patient.id }}" method="POST">
-                        <button type="submit">Remove</button>
-                    </form>
-                </td>
-            </tr>
-            {% endfor %}
-        </table>
-    {% else %}
-        <p style="text-align: center;">No patients found.</p>
-    {% endif %}
-{% endif %}
-{% endblock %}
+                        <button type="submit">
