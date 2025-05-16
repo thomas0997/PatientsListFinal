@@ -30,63 +30,63 @@
     }
 
     .form-wrapper {
-        text-align: center;
+        display: flex;
+        justify-content: center;  /* centers the whole form-wrapper */
         margin-top: 20px;
     }
 
-    .form-wrapper a {
-        text-decoration: none;
+    form {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 12px;  /* spacing between input and button-row */
     }
 
-    input {
-        width: 80%;
-        max-width: 400px;
-        text-align: left;
+    input[type="text"] {
+        width: 250px;
         font-family: -apple-system, 'SF Pro';
         border: 2px solid #7ABDE5;
         border-radius: 6px;
         padding: 8px;
-        margin: 8px auto;
         outline: none;
         background-color: transparent;
         color: #333;
         box-sizing: border-box;
+        text-align: left;
+        font-size: 14px;
         display: block;
     }
 
-    input[type="date"] {
-        text-align: left;
-    }
-
-    input[type="date"]::placeholder {
-        text-align: left;
-    }
-
-    input:focus {
+    input[type="text"]:focus {
         border-color: #5caed3;
     }
 
+    .button-row {
+        display: flex;
+        justify-content: center;
+        gap: 10px;  /* spacing between the two buttons */
+        width: 100%;
+        max-width: 280px;
+    }
+
     button {
-        max-width: 400px;
+        flex: 1;
         font-family: -apple-system, 'SF Pro';
         border: 2px solid #7ABDE5;
         border-radius: 100px;
         padding: 8px 16px;
-        font-size: 10px;
-        margin: 8px auto;
-        outline: none;
+        font-size: 12px;
         background-color: #7ABDE5;
         color: white;
         box-sizing: border-box;
-        display: block;
-        margin-top: 20px;
+        cursor: pointer;
+        transition: background-color 0.3s ease, border-color 0.3s ease;
+        text-align: center;
     }
 
     button:hover {
         background-color: #688FE5;
         border-color: #688FE5;
-        cursor: pointer;
-        transition: background-color 0.3s ease;
     }
 
     table {
@@ -122,17 +122,19 @@
 <h1>Find a Patient</h1>
 
 <div class="form-wrapper">
-    <form action="/search" method="GET">
-        <input type="text" name="query" placeholder="Search for a Name" autocomplete="off" autofocus required>
-       <button style="font-weight: bold;" type="submit">Find</button>
-    </form>
+    <form action="/search" method="GET" autocomplete="off" autofocus required>
+        <input type="text" name="query" placeholder="Search for a Name" required>
 
-    <button type="button" style="font-weight: bold;" onclick="window.location.href='/'">Go Back</button>
+        <div class="button-row">
+            <button type="submit" style="font-weight: bold;">Find</button>
+            <button type="button" style="font-weight: bold;" onclick="window.location.href='/'">Go Back</button>
+        </div>
+    </form>
 </div>
 
 {% if searched %}
     {% if patients %}
-        <h2 style="text-align: center;">Results:</h2>
+        <h2>Results:</h2>
         <table>
             <tr>
                 <th>ID</th>
