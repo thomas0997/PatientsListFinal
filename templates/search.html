@@ -151,4 +151,14 @@
                 <td>{{ patient.address }}</td>
                 <td>
                     <form action="/remove/{{ patient.id }}" method="POST">
-                        <button type="submit">
+                        <button type="submit">Remove</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </table>
+    {% else %}
+        <p class="no-results">No patients found.</p>
+    {% endif %}
+{% endif %}
+{% endblock %}
