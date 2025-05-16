@@ -1,0 +1,154 @@
+{% extends "layout.html" %}
+
+{% block body %}
+<style>
+    .logo-header {
+        background-color: #7ABDE5;
+        padding: 10px;
+        text-align: left;
+    }
+
+    .logo-header img {
+        height: 60px;
+        width: auto;
+        margin-left: 5px;
+    }
+
+    h1 {
+        text-align: center;
+        font-family: -apple-system, 'SF Pro';
+        margin-top: 40px;
+        color: #7ABDE5;
+        text-shadow: 0px 0px 5px rgba(104, 143, 229, 0.5);
+    }
+    h2{
+        text-align: center;
+        font-family: -apple-system, 'SF Pro';
+        margin-top: 40px;
+        color: #7ABDE5;
+    }
+    .form-wrapper {
+        text-align: center;
+        margin-top: 20px;
+    }
+    .form-wrapper a {
+        text-decoration: none;
+    }
+
+    input {
+        width: 80%;
+        max-width: 400px;
+        text-align: left;
+        font-family: -apple-system, 'SF Pro';
+        border: 2px solid #7ABDE5;
+        border-radius: 6px;
+        padding: 8px;
+        margin: 8px auto;
+        outline: none;
+        background-color: transparent;
+        color: #333;
+        box-sizing: border-box;
+        display: block;
+    }
+
+    input[type="date"] {
+        text-align: left;
+    }
+
+    input[type="date"]::placeholder {
+        text-align: left;
+    }
+
+    input:focus {
+        border-color: #5caed3;
+    }
+
+    button {
+        max-width: 400px;
+        font-family: -apple-system, 'SF Pro';
+        border: 2px solid #7ABDE5;
+        border-radius: 100px;
+        padding: 8px 16px;
+        font-size: 10px;
+        margin: 8px auto;
+        outline: none;
+        background-color: #7ABDE5;
+        color: white;
+        box-sizing: border-box;
+        display: block;
+        margin-top: 20px;
+    }
+
+    button:hover {
+        background-color: #688FE5;
+        border-color: #688FE5;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+    }
+
+    table {
+        margin: 30px auto;
+        border-collapse: collapse;
+        font-family: -apple-system, 'SF Pro';
+    }
+
+    th, td {
+        padding: 10px 20px;
+        border: 1px solid #ccc;
+        text-align: center;
+    }
+
+    th {
+        background-color: #7ABDE5;
+        color: white;
+    }
+
+</style>
+
+<div class="logo-header">
+    <img src="{{ url_for('static', filename='AURON.png') }}" alt="Logo">
+</div>
+
+<h1>Find a Patient</h1>
+
+<div class="form-wrapper">
+    <form action="/search" method="GET">
+        <input type="text" name="query" placeholder="Search for a Name" autocomplete="off" autofocus required>
+        <button type="submit">Find</button>
+    </form>
+
+    <a href="/"><button type="button">Go Back</button></a>
+</div>
+
+{% if searched %}
+    {% if patients %}
+        <h2 style="text-align: center;">Results:</h2>
+        <table>
+            <tr>
+                <th>ID</th>
+                <th>First Name</th>
+                <th>Last Name</th>
+                <th>DOB</th>
+                <th>Address</th>
+                <th></th>
+            </tr>
+            {% for patient in patients %}
+            <tr>
+                <td>{{ patient.id }}</td>
+                <td>{{ patient.firstName }}</td>
+                <td>{{ patient.lastName }}</td>
+                <td>{{ patient.dob }}</td>
+                <td>{{ patient.address }}</td>
+                <td>
+                    <form action="/remove/{{ patient.id }}" method="POST">
+                        <button type="submit">Remove</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </table>
+    {% else %}
+        <p style="text-align: center;">No patients found.</p>
+    {% endif %}
+{% endif %}
+{% endblock %}

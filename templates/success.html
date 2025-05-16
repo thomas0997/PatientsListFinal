@@ -1,0 +1,61 @@
+{% extends "layout.html" %}
+
+{% block body %}
+<!--  -->
+<style>
+        .logo-header {
+        background-color: #7ABDE5;
+        padding: 10px;
+        text-align: left;
+    }
+
+    .logo-header img {
+        height: 60px;
+        width: auto;
+        margin-left: 5px;
+    }
+
+    h1 {
+        text-align: center;
+        font-family: -apple-system, 'SF Pro';
+        margin-top: 40px;
+        color: #7ABDE5;
+        text-shadow: 0px 0px 5px rgba(104, 143, 229, 0.5);
+    }
+    button {
+        margin: 0 10px;  /* 0 top & bottom, 10px left & right */
+        max-width: 400px;
+        text-align: center;
+        font-family: -apple-system, 'SF Pro';
+        border: 2px solid #7ABDE5;
+        border-radius: 100px;
+        padding: 16px 32px;  /* Increased padding for bigger size */
+        font-size: 10px;     /* Larger font size */
+        margin: 8px 0;
+        outline: none;
+        background-color: #7ABDE5;
+        color: white;
+        box-sizing: border-box;
+    }
+    button:hover {
+        background-color: #688FE5; /* darker blue */
+        border-color: #688FE5;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+    }
+        .centered-button {
+        text-align: center;
+        margin-top: 20px;
+        }
+
+</style>
+<div class="logo-header">
+    <img src="{{ url_for('static', filename='AURON.png') }}" alt="Logo">
+</div>
+
+    <h1>Patient Successfully Added!</h1>
+    <div class="centered-button">
+        <a href="/"><button type="button">Go Back</button></a>
+      </div>
+
+{% endblock %}
