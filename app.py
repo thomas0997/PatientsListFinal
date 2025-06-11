@@ -20,6 +20,10 @@ def get_inventory_db():
     conn.row_factory = sqlite3.Row
     return conn
 
+@app.route('/favicon.ico')
+def favicon():
+    return redirect(url_for('static', filename='favicon.ico'))
+
 # CSV Upload Route - GET shows form, POST uploads CSV and imports data
 @app.route("/upload_csv", methods=["GET", "POST"])
 def upload_csv():
