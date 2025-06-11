@@ -2,7 +2,7 @@ import csv
 import sqlite3
 import os
 import io
-from flask import Flask, render_template, request, redirect, flash, url_for
+from flask import Flask, render_template, request, redirect, flash, url_for, send_file
 
 app = Flask(__name__)
 app.secret_key = 'your_secret_key_here'  # Needed for flashing messages
@@ -15,8 +15,9 @@ def get_db():
     conn.row_factory = sqlite3.Row  # For dict-style access (e.g., row["firstName"])
     return conn
 
-# CSV Upload Route - GET shows form, POST uploads CSV and imports data
-@app.route("/upload_csv", methods=["GET", "POST"])
+from flask import send_file
+
+@app.route("/upload", methods=["GET", "POST"])
 def upload_csv():
     if request.method == "POST":
         if "file" not in request.files:
@@ -39,7 +40,7 @@ def upload_csv():
 
             db = get_db()
             db.execute("DELETE FROM patients")
-            db.execute("DELETE FROM sqlite_sequence WHERE name='patients'")  # reset AUTOINCREMENT
+            db.execute("DELETE FROM sqlite_sequence WHERE name='patients'")
             db.commit()
 
             for row in reader:
@@ -57,6 +58,26 @@ def upload_csv():
             return redirect(request.url)
 
     return render_template("upload.html")
+
+@app.route("/download_csv")
+def download_csv():
+    db = get_db()
+    rows = db.execute("SELECT * FROM patients").fetchall()
+
+    # Create in-memory CSV
+    output = io.StringIO()
+    writer = csv.writer(output)
+    writer.writerow(["ID", "First Name", "Last Name", "D.O.B (MM/DD/YYYY)", "Address"])  # headers
+    for row in rows:
+        writer.writerow([row["id"], row["firstName"], row["lastName"], row["dob"], row["address"]])
+
+    output.seek(0)
+    return send_file(
+        io.BytesIO(output.getvalue().encode()),
+        mimetype="text/csv",
+        as_attachment=True,
+        download_name="patients_export.csv"
+    )
 
 
 # Main Page
