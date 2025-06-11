@@ -3,10 +3,9 @@
 {% block body %}
 <!--Add a Patient-->
 <style>
-    div{
+    div {
         text-align: center;
     }
-
 
     .logo-header {
         background-color: #7ABDE5;
@@ -28,26 +27,43 @@
         text-shadow: 0px 0px 2px rgba(104, 143, 229, 0.5);
     }
 
+    .button-row {
+        display: flex;
+        justify-content: center;  /* center buttons horizontally */
+        gap: 10px;  /* spacing between buttons */
+        margin-top: 16px;
+        max-width: 280px;
+        margin-left: auto;
+        margin-right: auto;
+    }
 
-    button{
-        margin: 0 10px;  /* 0 top & bottom, 10px left & right */
-        max-width: 400px;
-        text-align: left;            /* Align text left */
+    button {
+        flex: 1;
+        max-width: 140px;
+        text-align: center; /* center button text */
         font-family: -apple-system, 'SF Pro';
+        font-weight: bold;
         border: 2px solid #7ABDE5;
         border-radius: 100px;
         padding: 8px;
-        margin: 8px 0;
         outline: none;
         background-color: #7ABDE5;
-        color: #333;
+        color: white;
         box-sizing: border-box;
+        cursor: pointer;
+        transition: background-color 0.3s ease, border-color 0.3s ease;
+    }
+
+    button:hover {
+        background-color: #688FE5;
+        border-color: #688FE5;
+        color: white;
     }
 
     input {
         width: 80%;
         max-width: 400px;
-        text-align: left;            /* Align text left */
+        text-align: left; /* Left align typed text */
         font-family: -apple-system, 'SF Pro';
         border: 2px solid #7ABDE5;
         border-radius: 6px;
@@ -56,14 +72,13 @@
         outline: none;
         background-color: transparent;
         color: #333;
-        box-sizing: border-box;      /* Include padding and border in width */
+        box-sizing: border-box;
     }
 
     input[type="date"] {
-        text-align: left;            /* Make date text also left-aligned */
+        text-align: left;
     }
 
-    /* Remove placeholder styling on date if needed */
     input[type="date"]::placeholder {
         text-align: left;
     }
@@ -71,30 +86,25 @@
     input:focus {
         border-color: #5caed3;
     }
-
 </style>
-
-
-
-
-
-
 
 <div class="logo-header">
     <img src="{{ url_for('static', filename='AURON.png') }}" alt="Logo">
 </div>
 
+<h1>Add a Patient</h1>
 
+<div class="container">
+    <form action="/register" method="post">
+        <input autocomplete="off" required id="fName" autofocus name="firstName" placeholder="First Name" type="text"><br>
+        <input autocomplete="off" required name="lastName" placeholder="Last Name" type="text"><br>
+        <input autocomplete="off" required name="dob" placeholder="Date of Birth" type="date"><br>
+        <input autocomplete="off" required name="address" placeholder="Address" type="text"><br>
 
-    <h1>Add a Patient</h1>
-    <div class="container">
-        <form action="/register" method="post">  <!--TODO: /register is the route-->
-            <input autocomplete="off" required id="fName" autofocus name="firstName" placeholder="First Name" type="text"><br>
-            <input autocomplete="off" required autofocus name="lastName" placeholder="Last Name" type="text"><br>
-            <input autocomplete="off" required autofocus name="dob" placeholder="Date of Birth" type="date"><br>
-            <input autocomplete="off" required autofocus name="address" placeholder="Address" type="text"><br>
-            <button type="submit">➕</button>
-        </form>
-        <a href="/"><button type="button">Go Back</button></a>  <!-- Go back Button -->
-    </div>
+        <div class="button-row">
+            <button type="submit">Add Patient</button>
+            <button type="button" onclick="window.location.href='/'">Go Back</button>
+        </div>
+    </form>
+</div>
 {% endblock %}
