@@ -1,9 +1,11 @@
 import csv
 import sqlite3
 import os
-from flask import Flask, render_template, request, redirect
+import io
+from flask import Flask, render_template, request, redirect, flash, url_for
 
 app = Flask(__name__)
+app.secret_key = 'your_secret_key_here'  # Needed for flashing messages
 
 basedir = os.path.abspath(os.path.dirname(__file__))
 
@@ -13,19 +15,49 @@ def get_db():
     conn.row_factory = sqlite3.Row  # For dict-style access (e.g., row["firstName"])
     return conn
 
-# Import CSV
-@app.route("/import_csv")
-def import_csv():
-    db = get_db()
-    with open('patients.csv', 'r') as file:
-        reader = csv.DictReader(file)
-        for row in reader:
-            db.execute(
-                "INSERT INTO patients (firstName, lastName, dob, address) VALUES (?, ?, ?, ?)",
-                (row["First Name"], row["Last Name"], row["D.O.B (MM/DD/YYYY)"], row["Address"])
-            )
-        db.commit()
-    return "CSV Data Imported Successfully!"
+# CSV Upload Route - GET shows form, POST uploads CSV and imports data
+@app.route("/upload_csv", methods=["GET", "POST"])
+def upload_csv():
+    if request.method == "POST":
+        if "file" not in request.files:
+            flash("No file part")
+            return redirect(request.url)
+
+        file = request.files["file"]
+
+        if file.filename == "":
+            flash("No file selected")
+            return redirect(request.url)
+
+        if not file.filename.endswith(".csv"):
+            flash("Please upload a CSV file")
+            return redirect(request.url)
+
+        try:
+            stream = io.StringIO(file.stream.read().decode("UTF8"), newline=None)
+            reader = csv.DictReader(stream)
+
+            db = get_db()
+            db.execute("DELETE FROM patients")
+            db.execute("DELETE FROM sqlite_sequence WHERE name='patients'")  # reset AUTOINCREMENT
+            db.commit()
+
+            for row in reader:
+                db.execute(
+                    "INSERT INTO patients (firstName, lastName, dob, address) VALUES (?, ?, ?, ?)",
+                    (row["First Name"], row["Last Name"], row["D.O.B (MM/DD/YYYY)"], row["Address"])
+                )
+            db.commit()
+
+            flash("CSV Data Imported and Database Reset Successfully!")
+            return redirect(url_for("upload_csv"))
+
+        except Exception as e:
+            flash(f"Error processing CSV: {e}")
+            return redirect(request.url)
+
+    return render_template("upload.html")
+
 
 # Main Page
 @app.route("/", methods=["GET", "POST"])
