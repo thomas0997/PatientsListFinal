@@ -1,0 +1,22 @@
+{% extends "layout.html" %}
+
+{% block body %}
+<h1>Upload CSV File</h1>
+
+<form method="post" enctype="multipart/form-data">
+    <input type="file" name="file" accept=".csv" required>
+    <button type="submit">Upload</button>
+</form>
+
+{% with messages = get_flashed_messages() %}
+  {% if messages %}
+    <ul>
+      {% for msg in messages %}
+        <li>{{ msg }}</li>
+      {% endfor %}
+    </ul>
+  {% endif %}
+{% endwith %}
+
+<a href="/">Back to Home</a>
+{% endblock %}
