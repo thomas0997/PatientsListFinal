@@ -1,0 +1,125 @@
+{% extends "layout.html" %}
+
+{% block body %}
+<style>
+    .logo-header {
+        background-color: #7ABDE5;
+        padding: 10px;
+        text-align: left;
+    }
+
+    .logo-header img {
+        height: 60px;
+        width: auto;
+        margin-left: 5px;
+    }
+
+    h1 {
+        text-align: center;
+        font-family: -apple-system, 'SF Pro';
+        margin-top: 40px;
+        color: #7ABDE5;
+        text-shadow: 0px 0px 5px rgba(104, 143, 229, 0.5);
+    }
+
+    .container {
+        display: flex;
+        justify-content: center;
+        gap: 40px;
+        flex-wrap: wrap;
+        margin-top: 40px;
+    }
+
+    .circle-button {
+        width: 100px;
+        height: 100px;
+        border-radius: 50%;
+        border: none;
+        background-color: #7ABDE5;
+        color: white;
+        font-size: 14px;
+        font-weight: bold;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0px 4px 8px rgba(0,0,0,0.2);
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+        font-family: -apple-system, 'SF Pro';
+    }
+
+    .container a {
+        text-decoration: none;
+    }
+
+    .circle-button:hover {
+        background-color: #5caed3;
+    }
+
+    .circle-button svg {
+        width: 30px;
+        height: 30px;
+        margin-bottom: 5px;
+        fill: white;
+    }
+
+    .main-back-btn {
+        display: block;
+        margin: 30px auto 0 auto;
+        padding: 10px 24px;
+        font-family: -apple-system, 'SF Pro';
+        background-color: #7ABDE5;
+        border: none;
+        border-radius: 8px;
+        color: white;
+        font-weight: bold;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+    }
+
+    .main-back-btn:hover {
+        background-color: #5caed3;
+    }
+</style>
+
+<div class="logo-header">
+    <img src="{{ url_for('static', filename='AURON.png') }}" alt="Logo">
+</div>
+
+<h1>Inventory of Dra. Franco</h1>
+
+<div class="container">
+    <a href="/inventory/add">
+        <button class="circle-button">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 5v14m7-7H5" stroke="white" stroke-width="2" fill="none"/></svg>
+            Add
+        </button>
+    </a>
+
+    <a href="/inventory/find">
+        <button class="circle-button">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7" stroke="white" stroke-width="2" fill="none"/><line x1="16" y1="16" x2="22" y2="22" stroke="white" stroke-width="2"/></svg>
+            Find
+        </button>
+    </a>
+
+    <a href="/inventory/view">
+        <button class="circle-button">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18M3 12h18M3 18h18" stroke="white" stroke-width="2" fill="none"/></svg>
+            View
+        </button>
+    </a>
+
+    <a href="/inventory/logs">
+        <button class="circle-button">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="white" viewBox="0 0 24 24"><path d="M4 4h16v2H4zM4 11h16v2H4zM4 18h16v2H4z"/></svg>
+            Logs
+        </button>
+    </a>
+</div>
+
+<!-- Back to Main Menu Button -->
+<button class="main-back-btn" onclick="window.location.href='/'">Back to Main Menu</button>
+
+{% endblock %}

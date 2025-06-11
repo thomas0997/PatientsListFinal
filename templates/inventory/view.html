@@ -1,0 +1,134 @@
+{% extends "layout.html" %}
+
+{% block body %}
+<style>
+    .logo-header {
+        background-color: #7ABDE5;
+        padding: 10px;
+        text-align: left;
+    }
+
+    .logo-header img {
+        height: 60px;
+        width: auto;
+        margin-left: 5px;
+    }
+
+    h1 {
+        text-align: center;
+        font-family: -apple-system, 'SF Pro';
+        margin-top: 40px;
+        color: #7ABDE5;
+        text-shadow: 0px 0px 5px rgba(104, 143, 229, 0.5);
+    }
+
+    table {
+        margin: 30px auto;
+        border-collapse: collapse;
+        font-family: -apple-system, 'SF Pro';
+        width: 80%;
+    }
+
+    th, td {
+        padding: 10px 20px;
+        border: 1px solid #ccc;
+        text-align: center;
+    }
+
+    th {
+        background-color: #7ABDE5;
+        color: white;
+    }
+
+    .btn-group {
+        display: flex;
+        justify-content: center;
+        gap: 6px;
+    }
+
+    button {
+        border: none;
+        background-color: transparent;
+        font-size: 18px;
+        cursor: pointer;
+        color: #333;
+    }
+
+    button:hover {
+        color: #7ABDE5;
+    }
+
+    .delete-btn {
+        color: red;
+        font-weight: bold;
+    }
+
+    .back-btn {
+        font-family: -apple-system, 'SF Pro';
+        border: 2px solid #7ABDE5;
+        padding: 8px 16px;
+        border-radius: 100px;
+        background-color: #7ABDE5;
+        color: white;
+        cursor: pointer;
+        margin-top: 20px;
+    }
+
+    .back-btn:hover {
+        background-color: #5caed3;
+        border-color: #5caed3;
+    }
+</style>
+
+<div class="logo-header">
+    <img src="{{ url_for('static', filename='AURON.png') }}" alt="Logo">
+</div>
+
+<h1>Inventory List</h1>
+
+<table>
+    <tr>
+        <th>Name</th>
+        <th>Quantity</th>
+        <th>Actions</th>
+    </tr>
+    {% for med in meds %}
+    <tr>
+        <td>{{ med.name }}</td>
+        <td id="qty-{{ med.name|replace(' ', '_') }}">{{ med.quantity }}</td>
+        <td class="btn-group">
+            <button onclick="updateQuantity('{{ med.name }}', 'add')">➕</button>
+            <button onclick="updateQuantity('{{ med.name }}', 'remove')">➖</button>
+            <form method="POST" action="/inventory/remove/{{ med.name }}" onsubmit="return confirm('Are you sure you want to delete this medicine?');">
+                <button type="submit" class="delete-btn">🗑️</button>
+            </form>
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+
+<div style="text-align: center;">
+    <a href="/inventory">
+        <button class="back-btn">Back</button>
+    </a>
+</div>
+
+<script>
+function updateQuantity(name, action) {
+    fetch(`/inventory/ajax-update/${encodeURIComponent(name)}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: action })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.quantity !== undefined) {
+            const id = `qty-${name.replace(/\s/g, "_")}`;
+            document.getElementById(id).textContent = data.quantity;
+        } else {
+            alert("Error updating quantity");
+        }
+    });
+}
+</script>
+{% endblock %}

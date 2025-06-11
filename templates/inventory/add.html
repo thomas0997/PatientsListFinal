@@ -1,0 +1,98 @@
+{% extends "layout.html" %}
+
+{% block body %}
+<style>
+    div {
+        text-align: center;
+    }
+
+    .logo-header {
+        background-color: #7ABDE5;
+        padding: 10px;
+        text-align: left;
+    }
+
+    .logo-header img {
+        height: 60px;
+        width: auto;
+        margin-left: 5px;
+    }
+
+    h1 {
+        text-align: center;
+        font-family: -apple-system, 'SF Pro';
+        margin-top: 40px;
+        color: #7ABDE5;
+        text-shadow: 0px 0px 2px rgba(104, 143, 229, 0.5);
+    }
+
+    .button-row {
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+        margin-top: 16px;
+        max-width: 280px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    button {
+        flex: 1;
+        max-width: 140px;
+        text-align: center;
+        font-family: -apple-system, 'SF Pro';
+        font-weight: bold;
+        border: 2px solid #7ABDE5;
+        border-radius: 100px;
+        padding: 8px;
+        outline: none;
+        background-color: #7ABDE5;
+        color: white;
+        box-sizing: border-box;
+        cursor: pointer;
+        transition: background-color 0.3s ease, border-color 0.3s ease;
+    }
+
+    button:hover {
+        background-color: #688FE5;
+        border-color: #688FE5;
+    }
+
+    input {
+        width: 80%;
+        max-width: 400px;
+        text-align: left;
+        font-family: -apple-system, 'SF Pro';
+        border: 2px solid #7ABDE5;
+        border-radius: 6px;
+        padding: 8px;
+        margin: 8px 0;
+        outline: none;
+        background-color: transparent;
+        color: #333;
+        box-sizing: border-box;
+    }
+
+    input:focus {
+        border-color: #5caed3;
+    }
+</style>
+
+<div class="logo-header">
+    <img src="{{ url_for('static', filename='AURON.png') }}" alt="Logo">
+</div>
+
+<h1>Add Medicine</h1>
+
+<div class="container">
+    <form action="/inventory/add" method="post">
+        <input autocomplete="off" required name="name" placeholder="Name and Milligrams: Irbesartan 150mg" type="text"><br>
+        <input autocomplete="off" required name="quantity" placeholder="How Many?" type="number"><br>
+
+        <div class="button-row">
+            <button type="submit">Add Medicine</button>
+            <button type="button" onclick="window.location.href='/'">Go Back</button>
+        </div>
+    </form>
+</div>
+{% endblock %}

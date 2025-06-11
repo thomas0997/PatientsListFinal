@@ -1,0 +1,124 @@
+{% extends "layout.html" %}
+{% block body %}
+<style>
+    body, h1, h2, p, input, button {
+        font-family: -apple-system, 'SF Pro';
+    }
+
+    .logo-header {
+        background-color: #7ABDE5;
+        padding: 10px;
+        text-align: left;
+    }
+
+    .logo-header img {
+        height: 60px;
+        width: auto;
+        margin-left: 5px;
+    }
+
+    h1 {
+        text-align: center;
+        color: #7ABDE5;
+        text-shadow: 0px 0px 3px rgba(104, 143, 229, 0.5);
+        margin-top: 40px;
+    }
+
+    form {
+        text-align: center;
+        margin-top: 30px;
+    }
+
+    input[type="text"] {
+        padding: 10px;
+        width: 60%;
+        max-width: 300px;
+        font-family: -apple-system, 'SF Pro';
+        border: 2px solid #7ABDE5;
+        border-radius: 6px;
+        background-color: transparent;
+        outline: none;
+        color: #333;
+        box-sizing: border-box;
+        font-size: 14px;
+    }
+
+    input[type="text"]:focus {
+        border-color: #5caed3;
+    }
+
+    button {
+        font-weight: bold;
+        border: 2px solid #7ABDE5;
+        border-radius: 100px;
+        padding: 8px 24px;
+        background-color: #7ABDE5;
+        color: white;
+        cursor: pointer;
+        margin: 10px;
+        transition: background-color 0.3s ease, border-color 0.3s ease;
+    }
+
+    button:hover {
+        background-color: #688FE5;
+        border-color: #688FE5;
+    }
+
+    .container {
+        text-align: center;
+        margin: 40px auto;
+    }
+
+   .not-found {
+    text-align: center;
+    margin-top: 30px;
+    color: #688FE5;
+    font-size: 16px;
+    font-weight: bold;
+    }
+</style>
+
+<div class="logo-header">
+    <img src="{{ url_for('static', filename='AURON.png') }}" alt="Logo">
+</div>
+
+<h1>Find a Medicine</h1>
+
+<form method="post">
+    <input type="text" name="query" placeholder="Enter medicine name" required>
+    <br>
+    <button type="submit">Search</button>
+    <button type="button" onclick="window.location.href='/inventory'">Go Back</button>
+</form>
+
+{% if med %}
+<div class="container">
+    <h2>{{ med.name }}</h2>
+    <p><strong>Quantity:</strong> <span id="qty">{{ med.quantity }}</span></p>
+    <button onclick="updateQuantity('{{ med.name }}', 'add')">➕</button>
+    <button onclick="updateQuantity('{{ med.name }}', 'remove')">➖</button>
+</div>
+
+<script>
+function updateQuantity(name, action) {
+    fetch(`/inventory/ajax-update/${encodeURIComponent(name)}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: action })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.quantity !== undefined) {
+            document.getElementById("qty").textContent = data.quantity;
+        } else {
+            alert("Error updating quantity");
+        }
+    });
+}
+</script>
+
+{% elif searched %}
+<p class="not-found">No medicine found.</p>
+{% endif %}
+
+{% endblock %}
