@@ -3,11 +3,13 @@
 {% block body %}
 <h1>Upload CSV File</h1>
 
+<!-- CSV Upload Form -->
 <form method="post" enctype="multipart/form-data">
     <input type="file" name="file" accept=".csv" required>
     <button type="submit">Upload</button>
 </form>
 
+<!-- Flash messages -->
 {% with messages = get_flashed_messages() %}
   {% if messages %}
     <ul>
@@ -18,5 +20,11 @@
   {% endif %}
 {% endwith %}
 
-<a href="/">Back to Home</a>
+<!-- Download CSV Button -->
+<form action="{{ url_for('download_csv') }}" method="get" style="margin-top: 20px;">
+    <button type="submit">⬇️ Download Latest Patient List (CSV)</button>
+</form>
+
+<!-- Back Link -->
+<a href="/" style="display: block; margin-top: 20px;">Back to Home</a>
 {% endblock %}
