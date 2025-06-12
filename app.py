@@ -2,7 +2,7 @@ import csv
 import sqlite3
 import os
 import io
-from flask import Flask, render_template, request, redirect, flash, url_for, jsonify
+from flask import Flask, render_template, request, redirect, flash, url_for, send_file, jsonify
 from datetime import datetime
 
 app = Flask(__name__)
@@ -25,37 +25,59 @@ def favicon():
     return redirect(url_for('static', filename='favicon.ico'))
 
 # CSV Upload Route - GET shows form, POST uploads CSV and imports data
-@app.route("/upload_csv", methods=["GET", "POST"])
+@app.route("/upload", methods=["GET", "POST"])
 def upload_csv():
     if request.method == "POST":
-        file = request.files.get("file")
-        if not file or file.filename == "":
-            flash("No file selected")
+        action = request.form.get("action")
+
+        if action == "upload_patients":
+            file = request.files.get("file")
+            if not file or file.filename == "":
+                flash("No file selected")
+                return redirect(request.url)
+
+            if not file.filename.endswith(".csv"):
+                flash("Please upload a CSV file")
+                return redirect(request.url)
+
+            try:
+                stream = io.StringIO(file.stream.read().decode("UTF8"))
+                reader = csv.DictReader(stream)
+
+                db = get_patient_db()
+                db.execute("DELETE FROM patients")
+                db.execute("DELETE FROM sqlite_sequence WHERE name='patients'")
+                db.commit()
+
+                for row in reader:
+                    db.execute(
+                        "INSERT INTO patients (firstName, lastName, dob, address) VALUES (?, ?, ?, ?)",
+                        (row["First Name"], row["Last Name"], row["D.O.B (MM/DD/YYYY)"], row["Address"])
+                    )
+                db.commit()
+                flash("CSV Imported and Database Reset!")
+            except Exception as e:
+                flash(f"Error: {e}")
             return redirect(request.url)
 
-        if not file.filename.endswith(".csv"):
-            flash("Please upload a CSV file")
-            return redirect(request.url)
+        elif action == "export_inventory":
+            db = get_inventory_db()
+            meds = db.execute("SELECT * FROM medicines").fetchall()
 
-        try:
-            stream = io.StringIO(file.stream.read().decode("UTF8"))
-            reader = csv.DictReader(stream)
+            output = io.StringIO()
+            writer = csv.writer(output)
+            writer.writerow(["Name", "Type", "Quantity"])
+            for med in meds:
+                writer.writerow([med["name"], med["type"], med["quantity"]])
+            output.seek(0)
 
-            db = get_patient_db()
-            db.execute("DELETE FROM patients")
-            db.execute("DELETE FROM sqlite_sequence WHERE name='patients'")
-            db.commit()
+            return send_file(
+                io.BytesIO(output.getvalue().encode()),
+                mimetype="text/csv",
+                as_attachment=True,
+                download_name="inventory_export.csv"
+            )
 
-            for row in reader:
-                db.execute(
-                    "INSERT INTO patients (firstName, lastName, dob, address) VALUES (?, ?, ?, ?)",
-                    (row["First Name"], row["Last Name"], row["D.O.B (MM/DD/YYYY)"], row["Address"])
-                )
-            db.commit()
-            flash("CSV Imported and Database Reset!")
-        except Exception as e:
-            flash(f"Error: {e}")
-        return redirect(request.url)
     return render_template("upload.html")
 
 

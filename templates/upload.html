@@ -1,12 +1,77 @@
 {% extends "layout.html" %}
 
 {% block body %}
-<h1>Upload CSV File</h1>
+<style>
+    body, h1, button, input, a, li {
+        font-family: -apple-system, 'SF Pro';
+    }
 
-<!-- CSV Upload Form -->
+    h1 {
+        color: #7ABDE5;
+        text-align: center;
+        margin-top: 30px;
+    }
+
+    form {
+        text-align: center;
+        margin-top: 20px;
+    }
+
+    input[type="file"] {
+        margin: 10px 0;
+    }
+
+    button {
+        border: 2px solid #7ABDE5;
+        border-radius: 100px;
+        padding: 10px 24px;
+        background-color: #7ABDE5;
+        color: white;
+        font-weight: bold;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+    }
+
+    button:hover {
+        background-color: #5caed3;
+    }
+
+    ul {
+        text-align: center;
+        color: green;
+        list-style-type: none;
+        padding: 0;
+        margin-top: 15px;
+    }
+
+    a {
+        display: block;
+        text-align: center;
+        margin-top: 30px;
+        color: #7ABDE5;
+        font-weight: bold;
+        text-decoration: none;
+    }
+
+    a:hover {
+        text-decoration: underline;
+    }
+</style>
+
+<h1>Upload or Export CSV</h1>
+
+<!-- Upload Patients CSV -->
 <form method="post" enctype="multipart/form-data">
     <input type="file" name="file" accept=".csv" required>
-    <button type="submit">Upload</button>
+    <br>
+    <button type="submit" name="action" value="upload_patients">📤 Upload Patients CSV</button>
+</form>
+
+<!-- Export Inventory CSV -->
+<form method="post">
+    <button type="submit" name="action" value="export_inventory" style="margin-top: 20px;">
+        📁 Export Inventory CSV
+    </button>
 </form>
 
 <!-- Flash messages -->
@@ -20,11 +85,10 @@
   {% endif %}
 {% endwith %}
 
-<!-- Download CSV Button -->
-<form action="{{ url_for('download_csv') }}" method="get" style="margin-top: 20px;">
+<!-- Download Latest Patients -->
+<form action="{{ url_for('download_csv') }}" method="get">
     <button type="submit">⬇️ Download Latest Patient List (CSV)</button>
 </form>
 
-<!-- Back Link -->
-<a href="/" style="display: block; margin-top: 20px;">Back to Home</a>
+<a href="/">← Back to Home</a>
 {% endblock %}
