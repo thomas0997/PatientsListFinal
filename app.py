@@ -206,14 +206,14 @@ def add_medicine():
 
 @app.route("/inventory/find", methods=["GET", "POST"])
 def inventory_find():
-    med = None
+    meds = []
     searched = False
     if request.method == "POST":
         name = request.form.get("query")
         db = get_inventory_db()
-        med = db.execute("SELECT * FROM medicines WHERE name LIKE ?", (f"%{name}%",)).fetchone()
+        meds = db.execute("SELECT * FROM medicines WHERE name LIKE ?", (f"%{name}%",)).fetchall()
         searched = True
-    return render_template("inventory/find.html", med=med, searched=searched)
+    return render_template("inventory/find.html", meds=meds, searched=searched)
 
 @app.route("/inventory/remove/<name>", methods=["POST"])
 def remove_medicine(name):

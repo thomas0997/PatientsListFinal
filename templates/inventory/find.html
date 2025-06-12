@@ -33,7 +33,6 @@
         padding: 10px;
         width: 60%;
         max-width: 300px;
-        font-family: -apple-system, 'SF Pro';
         border: 2px solid #7ABDE5;
         border-radius: 6px;
         background-color: transparent;
@@ -69,12 +68,11 @@
         margin: 40px auto;
     }
 
-   .not-found {
-    text-align: center;
-    margin-top: 30px;
-    color: #688FE5;
-    font-size: 16px;
-    font-weight: bold;
+    .not-found {
+        text-align: center;
+        margin-top: 30px;
+        color: red;
+        font-size: 16px;
     }
 </style>
 
@@ -84,6 +82,7 @@
 
 <h1>Find a Medicine</h1>
 
+<!-- Search Form -->
 <form method="post">
     <input type="text" name="query" placeholder="Enter medicine name" required>
     <br>
@@ -91,13 +90,19 @@
     <button type="button" onclick="window.location.href='/inventory'">Go Back</button>
 </form>
 
-{% if med %}
-<div class="container">
-    <h2>{{ med.name }}</h2>
-    <p><strong>Quantity:</strong> <span id="qty">{{ med.quantity }}</span></p>
-    <button onclick="updateQuantity('{{ med.name }}', 'add')">➕</button>
-    <button onclick="updateQuantity('{{ med.name }}', 'remove')">➖</button>
-</div>
+<!-- Results -->
+{% if meds %}
+    {% for med in meds %}
+    <div class="container">
+        <h2>{{ med.name }}</h2>
+        <p><strong>Quantity:</strong> <span id="qty-{{ med.name|replace(' ', '_') }}">{{ med.quantity }}</span></p>
+        <button onclick="updateQuantity('{{ med.name }}', 'add')">➕</button>
+        <button onclick="updateQuantity('{{ med.name }}', 'remove')">➖</button>
+    </div>
+    {% endfor %}
+{% elif searched %}
+    <p class="not-found">No medicine found.</p>
+{% endif %}
 
 <script>
 function updateQuantity(name, action) {
@@ -109,16 +114,12 @@ function updateQuantity(name, action) {
     .then(response => response.json())
     .then(data => {
         if (data.quantity !== undefined) {
-            document.getElementById("qty").textContent = data.quantity;
+            const id = `qty-${name.replace(/\s/g, "_")}`;
+            document.getElementById(id).textContent = data.quantity;
         } else {
             alert("Error updating quantity");
         }
     });
 }
 </script>
-
-{% elif searched %}
-<p class="not-found">No medicine found.</p>
-{% endif %}
-
 {% endblock %}
