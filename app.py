@@ -166,9 +166,12 @@ def inventory_menu():
 
 @app.route("/inventory/view")
 def inventory_view():
+    sort = request.args.get("sort", "desc")
+    order = "DESC" if sort == "desc" else "ASC"
+
     db = get_inventory_db()
-    meds = db.execute("SELECT * FROM medicines").fetchall()
-    return render_template("inventory/view.html", meds=meds)
+    meds = db.execute(f"SELECT * FROM medicines ORDER BY quantity {order}").fetchall()
+    return render_template("inventory/view.html", meds=meds, sort=sort)
 
 @app.route("/inventory/logs")
 def inventory_logs():

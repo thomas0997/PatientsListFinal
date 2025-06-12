@@ -78,6 +78,39 @@
         background-color: #5caed3;
         border-color: #5caed3;
     }
+
+    .sort-form {
+        text-align: center;
+        margin-bottom: 20px;
+        font-family: -apple-system, 'SF Pro';
+    }
+
+    .sort-form select {
+        padding: 6px 12px;
+        border-radius: 8px;
+        border: 1px solid #7ABDE5;
+        font-family: -apple-system, 'SF Pro';
+        color: #7ABDE5;
+        font-weight: bold;
+        outline: none;
+    }
+
+    .sort-form button {
+        margin-left: 10px;
+        border: 2px solid #7ABDE5;
+        border-radius: 100px;
+        padding: 6px 14px;
+        font-family: -apple-system, 'SF Pro';
+        background-color: #7ABDE5;
+        color: white;
+        font-weight: bold;
+        cursor: pointer;
+    }
+
+    .sort-form button:hover {
+        background-color: #5caed3;
+        border-color: #5caed3;
+    }
 </style>
 
 <div class="logo-header">
@@ -86,29 +119,37 @@
 
 <h1>Inventory List</h1>
 
+<!-- Sort Form -->
+<div class="sort-form">
+    <form method="get" action="{{ url_for('inventory_view') }}">
+        <label for="sort" style="color: #7ABDE5; font-weight: bold;">Sort by Quantity:</label>
+        <select name="sort" id="sort">
+            <option value="desc" {% if sort == 'desc' %}selected{% endif %}>High to Low</option>
+            <option value="asc" {% if sort == 'asc' %}selected{% endif %}>Low to High</option>
+        </select>
+        <button type="submit">Sort</button>
+    </form>
+</div>
+
 <table>
-    <thead>
-        <tr>
-            <th>Name</th>
-            <th>Quantity</th>
-            <th>Actions</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for med in meds %}
-        <tr>
-            <td>{{ med.name }}</td>
-            <td id="qty-{{ med.name|replace(' ', '_') }}">{{ med.quantity }}</td>
-            <td class="btn-group">
-                <button onclick="updateQuantity('{{ med.name }}', 'add')">➕</button>
-                <button onclick="updateQuantity('{{ med.name }}', 'remove')">➖</button>
-                <form method="POST" action="/inventory/remove/{{ med.name }}" onsubmit="return confirm('Are you sure you want to delete this medicine?');" style="display:inline;">
-                    <button type="submit" class="delete-btn">🗑️</button>
-                </form>
-            </td>
-        </tr>
-        {% endfor %}
-    </tbody>
+    <tr>
+        <th>Name</th>
+        <th>Quantity</th>
+        <th>Actions</th>
+    </tr>
+    {% for med in meds %}
+    <tr>
+        <td>{{ med.name }}</td>
+        <td id="qty-{{ med.name|replace(' ', '_') }}">{{ med.quantity }}</td>
+        <td class="btn-group">
+            <button onclick="updateQuantity('{{ med.name }}', 'add')">➕</button>
+            <button onclick="updateQuantity('{{ med.name }}', 'remove')">➖</button>
+            <form method="POST" action="/inventory/remove/{{ med.name }}" onsubmit="return confirm('Are you sure you want to delete this medicine?');">
+                <button type="submit" class="delete-btn">🗑️</button>
+            </form>
+        </td>
+    </tr>
+    {% endfor %}
 </table>
 
 <div style="text-align: center;">
