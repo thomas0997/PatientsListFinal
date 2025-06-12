@@ -2,8 +2,8 @@ import csv
 import sqlite3
 import os
 import io
-from flask import Flask, render_template, request, redirect, flash, url_for, send_file, jsonify
 from datetime import datetime
+from flask import Flask, render_template, request, redirect, flash, url_for, send_file, jsonify
 
 app = Flask(__name__)
 app.secret_key = 'your_secret_key_here'
@@ -24,27 +24,7 @@ def get_inventory_db():
 def favicon():
     return redirect(url_for('static', filename='favicon.ico'))
 
-    
-@app.route("/export_inventory")
-def export_inventory_csv():
-    db = get_inventory_db()
-    meds = db.execute("SELECT * FROM medicines").fetchall()
-
-    output = io.StringIO()
-    writer = csv.writer(output)
-    writer.writerow(["Name", "Type", "Quantity"])
-    for med in meds:
-        writer.writerow([med["name"], med.get("type", ""), med["quantity"]])
-    output.seek(0)
-
-    return send_file(
-        io.BytesIO(output.getvalue().encode()),
-        mimetype="text/csv",
-        as_attachment=True,
-        download_name="inventory_export.csv"
-    )
-
-# CSV Upload Route - GET shows form, POST uploads CSV and imports data
+# ---------- UPLOAD & EXPORT ----------
 @app.route("/upload", methods=["GET", "POST"])
 def upload_csv():
     if request.method == "POST":
@@ -55,7 +35,6 @@ def upload_csv():
             if not file or file.filename == "":
                 flash("No file selected")
                 return redirect(request.url)
-
             if not file.filename.endswith(".csv"):
                 flash("Please upload a CSV file")
                 return redirect(request.url)
@@ -75,52 +54,41 @@ def upload_csv():
                         (row["First Name"], row["Last Name"], row["D.O.B (MM/DD/YYYY)"], row["Address"])
                     )
                 db.commit()
-                flash("CSV Imported and Database Reset!")
+                flash("Patients CSV uploaded and database updated!")
             except Exception as e:
-                flash(f"Error: {e}")
+                flash(f"Upload error: {e}")
             return redirect(request.url)
 
         elif action == "export_inventory":
             db = get_inventory_db()
             meds = db.execute("SELECT * FROM medicines").fetchall()
-
             output = io.StringIO()
             writer = csv.writer(output)
             writer.writerow(["Name", "Type", "Quantity"])
             for med in meds:
-                writer.writerow([med["name"], med["type"], med["quantity"]])
+                writer.writerow([
+                    med["name"],
+                    med["type"] if "type" in med.keys() else "",
+                    med["quantity"]
+                ])
             output.seek(0)
+            return send_file(io.BytesIO(output.getvalue().encode()), mimetype="text/csv", as_attachment=True, download_name="inventory_export.csv")
 
-            return send_file(
-                io.BytesIO(output.getvalue().encode()),
-                mimetype="text/csv",
-                as_attachment=True,
-                download_name="inventory_export.csv"
-            )
+        elif action == "export_patients":
+            db = get_patient_db()
+            rows = db.execute("SELECT * FROM patients").fetchall()
+            output = io.StringIO()
+            writer = csv.writer(output)
+            writer.writerow(["ID", "First Name", "Last Name", "D.O.B (MM/DD/YYYY)", "Address"])
+            for row in rows:
+                writer.writerow([row["id"], row["firstName"], row["lastName"], row["dob"], row["address"]])
+            output.seek(0)
+            return send_file(io.BytesIO(output.getvalue().encode()), mimetype="text/csv", as_attachment=True, download_name="patients_export.csv")
 
     return render_template("upload.html")
 
-@app.route("/download_csv")
-def download_csv():
-    db = get_patient_db()
-    rows = db.execute("SELECT * FROM patients").fetchall()
-    
-    output = io.StringIO()
-    writer = csv.writer(output)
-    writer.writerow(["ID", "First Name", "Last Name", "D.O.B (MM/DD/YYYY)", "Address"])
-    for row in rows:
-        writer.writerow([row["id"], row["firstName"], row["lastName"], row["dob"], row["address"]])
-    
-    output.seek(0)
-    return send_file(
-        io.BytesIO(output.getvalue().encode()),
-        mimetype="text/csv",
-        as_attachment=True,
-        download_name="patients_export.csv"
-    )
-
-# Main Page
-@app.route("/", methods=["GET", "POST"])
+# ---------- MAIN ROUTES ----------
+@app.route("/")
 def index():
     return render_template("index.html")
 
@@ -154,7 +122,7 @@ def register():
     address = request.form.get("address")
     if not first or not last or not dob:
         return render_template("failure.html")
-    missing_id = db.execute("""SELECT MIN(t1.id + 1) AS next_id FROM patients t1 LEFT JOIN patients t2 ON t1.id + 1 = t2.id WHERE t2.id IS NULL""").fetchone()["next_id"]
+    missing_id = db.execute("SELECT MIN(t1.id + 1) AS next_id FROM patients t1 LEFT JOIN patients t2 ON t1.id + 1 = t2.id WHERE t2.id IS NULL").fetchone()["next_id"]
     next_id = missing_id if missing_id else (db.execute("SELECT MAX(id) AS max_id FROM patients").fetchone()["max_id"] or 0) + 1
     db.execute("INSERT INTO patients (id, firstName, lastName, dob, address) VALUES (?, ?, ?, ?, ?)", (next_id, first, last, dob, address))
     db.commit()
@@ -188,7 +156,6 @@ def inventory_menu():
 def inventory_view():
     sort = request.args.get("sort", "desc")
     order = "DESC" if sort == "desc" else "ASC"
-
     db = get_inventory_db()
     meds = db.execute(f"SELECT * FROM medicines ORDER BY quantity {order}").fetchall()
     return render_template("inventory/view.html", meds=meds, sort=sort)
@@ -212,16 +179,13 @@ def add_medicine():
     if request.method == "POST":
         name = request.form.get("name")
         quantity = int(request.form.get("quantity") or 0)
-
         if not name or quantity < 0:
             flash("Invalid input.")
             return redirect(request.url)
-
         db = get_inventory_db()
         db.execute("INSERT OR REPLACE INTO medicines (name, quantity) VALUES (?, ?)", (name, quantity))
         db.commit()
         return render_template("inventory/success.html")
-
     return render_template("inventory/add.html")
 
 @app.route("/inventory/find", methods=["GET", "POST"])
@@ -247,38 +211,24 @@ def remove_medicine(name):
 def ajax_update_quantity(name):
     data = request.get_json()
     action = data.get("action")
-
     db = get_inventory_db()
     med = db.execute("SELECT * FROM medicines WHERE name = ?", (name,)).fetchone()
     if not med:
         return jsonify({"error": "Medicine not found"}), 404
-
     change = 1 if action == "add" else -1
     new_qty = max(0, med["quantity"] + change)
-
-    # Update quantity in medicines table
     db.execute("UPDATE medicines SET quantity = ? WHERE name = ?", (new_qty, name))
-
-    # Get today's date (not full timestamp)
     today = datetime.now().date().isoformat()
-
-    # Try to find existing log entry for today and medicine
-    existing_log = db.execute("""
-        SELECT id, change FROM logs
-        WHERE medicine_name = ? AND date(timestamp) = ?
-        ORDER BY id DESC LIMIT 1
-    """, (name, today)).fetchone()
-
+    existing_log = db.execute("SELECT id, change FROM logs WHERE medicine_name = ? AND date(timestamp) = ? ORDER BY id DESC LIMIT 1", (name, today)).fetchone()
     if existing_log:
         new_change = existing_log["change"] + change
         db.execute("UPDATE logs SET change = ?, timestamp = ? WHERE id = ?", (new_change, datetime.now().isoformat(), existing_log["id"]))
     else:
         db.execute("INSERT INTO logs (medicine_name, change, timestamp) VALUES (?, ?, ?)", (name, change, datetime.now().isoformat()))
-
     db.commit()
-
     return jsonify({"quantity": new_qty})
 
+# ---------- RUN APP ----------
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 10000))
     app.run(host="0.0.0.0", port=port)
