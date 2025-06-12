@@ -24,6 +24,26 @@ def get_inventory_db():
 def favicon():
     return redirect(url_for('static', filename='favicon.ico'))
 
+    
+@app.route("/export_inventory")
+def export_inventory_csv():
+    db = get_inventory_db()
+    meds = db.execute("SELECT * FROM medicines").fetchall()
+
+    output = io.StringIO()
+    writer = csv.writer(output)
+    writer.writerow(["Name", "Type", "Quantity"])
+    for med in meds:
+        writer.writerow([med["name"], med.get("type", ""), med["quantity"]])
+    output.seek(0)
+
+    return send_file(
+        io.BytesIO(output.getvalue().encode()),
+        mimetype="text/csv",
+        as_attachment=True,
+        download_name="inventory_export.csv"
+    )
+
 # CSV Upload Route - GET shows form, POST uploads CSV and imports data
 @app.route("/upload", methods=["GET", "POST"])
 def upload_csv():

@@ -30,6 +30,7 @@
         font-weight: bold;
         cursor: pointer;
         transition: background-color 0.3s ease;
+        margin: 5px;
     }
 
     button:hover {
@@ -67,11 +68,14 @@
     <button type="submit" name="action" value="upload_patients">📤 Upload Patients CSV</button>
 </form>
 
-<!-- Export Inventory CSV -->
-<form method="post">
-    <button type="submit" name="action" value="export_inventory" style="margin-top: 20px;">
-        📁 Export Inventory CSV
-    </button>
+<!-- Export Inventory CSV (GET) -->
+<form action="{{ url_for('export_inventory_csv') }}" method="get">
+    <button type="submit">📁 Export Inventory CSV</button>
+</form>
+
+<!-- Download Patients CSV (GET) -->
+<form action="{{ url_for('download_csv') }}" method="get">
+    <button type="submit">⬇️ Download Patient List CSV</button>
 </form>
 
 <!-- Flash messages -->
@@ -84,11 +88,6 @@
     </ul>
   {% endif %}
 {% endwith %}
-
-<!-- Download Latest Patients -->
-<form action="{{ url_for('download_csv') }}" method="get">
-    <button type="submit">⬇️ Download Latest Patient List (CSV)</button>
-</form>
 
 <a href="/">← Back to Home</a>
 {% endblock %}
