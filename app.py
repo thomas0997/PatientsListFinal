@@ -80,6 +80,24 @@ def upload_csv():
 
     return render_template("upload.html")
 
+@app.route("/download_csv")
+def download_csv():
+    db = get_patient_db()
+    rows = db.execute("SELECT * FROM patients").fetchall()
+    
+    output = io.StringIO()
+    writer = csv.writer(output)
+    writer.writerow(["ID", "First Name", "Last Name", "D.O.B (MM/DD/YYYY)", "Address"])
+    for row in rows:
+        writer.writerow([row["id"], row["firstName"], row["lastName"], row["dob"], row["address"]])
+    
+    output.seek(0)
+    return send_file(
+        io.BytesIO(output.getvalue().encode()),
+        mimetype="text/csv",
+        as_attachment=True,
+        download_name="patients_export.csv"
+    )
 
 # Main Page
 @app.route("/", methods=["GET", "POST"])
