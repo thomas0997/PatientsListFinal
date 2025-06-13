@@ -79,8 +79,8 @@
 </form>
 
 <!-- Export Patients CSV -->
-<form action="{{ url_for('download_csv') }}" method="get">
-    <button type="submit">📁 Export Patients CSV</button>
+<form method="post">
+    <button type="submit" name="action" value="export_patients">📁 Export Patients CSV</button>
 </form>
 
 <!-- Flash messages -->
