@@ -55,9 +55,9 @@ def upload_csv():
                         (row["First Name"], row["Last Name"], row["D.O.B (MM/DD/YYYY)"], row["Address"])
                     )
                 db.commit()
-                flash("Patients CSV imported and database reset!")
+                flash("✅ Patients CSV uploaded and database reset!")
             except Exception as e:
-                flash(f"Error uploading patients CSV: {e}")
+                flash(f"⚠️ Error uploading patients CSV: {e}")
             return redirect(request.url)
 
         elif action == "upload_inventory":
@@ -81,9 +81,9 @@ def upload_csv():
                     quantity = int(row["Quantity"])
                     db.execute("INSERT INTO medicines (name, quantity) VALUES (?, ?)", (name, quantity))
                 db.commit()
-                flash("Inventory CSV uploaded and database updated!")
+                flash("✅ Inventory CSV uploaded and database updated!")
             except Exception as e:
-                flash(f"Error uploading inventory CSV: {e}")
+                flash(f"⚠️ Error uploading inventory CSV: {e}")
             return redirect(request.url)
 
         elif action == "export_inventory":
@@ -102,6 +102,24 @@ def upload_csv():
                 mimetype="text/csv",
                 as_attachment=True,
                 download_name="inventory_export.csv"
+            )
+
+        elif action == "export_patients":
+            db = get_patient_db()
+            patients = db.execute("SELECT * FROM patients").fetchall()
+
+            output = io.StringIO()
+            writer = csv.writer(output)
+            writer.writerow(["ID", "First Name", "Last Name", "D.O.B (MM/DD/YYYY)", "Address"])
+            for p in patients:
+                writer.writerow([p["id"], p["firstName"], p["lastName"], p["dob"], p["address"]])
+            output.seek(0)
+
+            return send_file(
+                io.BytesIO(output.getvalue().encode()),
+                mimetype="text/csv",
+                as_attachment=True,
+                download_name="patients_export.csv"
             )
 
     return render_template("upload.html")
