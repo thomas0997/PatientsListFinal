@@ -62,21 +62,27 @@
 <h1>Upload or Export CSV</h1>
 
 <!-- Upload Patients CSV -->
-
 <form method="post" enctype="multipart/form-data">
-  <input type="file" name="file" accept=".csv" required>
-  <button type="submit" name="action" value="upload_patients">📤 Upload Patients CSV</button>
+    <input type="file" name="file" accept=".csv" required>
+    <button type="submit" name="action" value="upload_patients">📤 Upload Patients CSV</button>
 </form>
 
-<!-- Export Inventory -->
-<form method="post">
-  <button type="submit" name="action" value="export_inventory">📁 Export Inventory CSV</button>
+<!-- Upload Inventory CSV -->
+<form method="post" enctype="multipart/form-data">
+    <input type="file" name="file" accept=".csv" required>
+    <button type="submit" name="action" value="upload_inventory">📤 Upload Inventory CSV</button>
 </form>
 
-<!-- Export Patients -->
+<!-- Export Inventory CSV -->
 <form method="post">
-  <button type="submit" name="action" value="export_patients">📁 Export Patients CSV</button>
+    <button type="submit" name="action" value="export_inventory">📁 Export Inventory CSV</button>
 </form>
+
+<!-- Export Patients CSV -->
+<form action="{{ url_for('download_csv') }}" method="get">
+    <button type="submit">📁 Export Patients CSV</button>
+</form>
+
 <!-- Flash messages -->
 {% with messages = get_flashed_messages() %}
   {% if messages %}

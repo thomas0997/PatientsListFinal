@@ -35,6 +35,7 @@ def upload_csv():
             if not file or file.filename == "":
                 flash("No file selected")
                 return redirect(request.url)
+
             if not file.filename.endswith(".csv"):
                 flash("Please upload a CSV file")
                 return redirect(request.url)
@@ -54,36 +55,54 @@ def upload_csv():
                         (row["First Name"], row["Last Name"], row["D.O.B (MM/DD/YYYY)"], row["Address"])
                     )
                 db.commit()
-                flash("Patients CSV uploaded and database updated!")
+                flash("Patients CSV imported and database reset!")
             except Exception as e:
-                flash(f"Upload error: {e}")
+                flash(f"Error uploading patients CSV: {e}")
+            return redirect(request.url)
+
+        elif action == "upload_inventory":
+            file = request.files.get("file")
+            if not file or file.filename == "":
+                flash("No file selected")
+                return redirect(request.url)
+
+            if not file.filename.endswith(".csv"):
+                flash("Please upload a CSV file")
+                return redirect(request.url)
+
+            try:
+                stream = io.StringIO(file.stream.read().decode("UTF8"))
+                reader = csv.DictReader(stream)
+
+                db = get_inventory_db()
+                db.execute("DELETE FROM medicines")
+                for row in reader:
+                    name = row["Name"]
+                    quantity = int(row["Quantity"])
+                    db.execute("INSERT INTO medicines (name, quantity) VALUES (?, ?)", (name, quantity))
+                db.commit()
+                flash("Inventory CSV uploaded and database updated!")
+            except Exception as e:
+                flash(f"Error uploading inventory CSV: {e}")
             return redirect(request.url)
 
         elif action == "export_inventory":
             db = get_inventory_db()
             meds = db.execute("SELECT * FROM medicines").fetchall()
-            output = io.StringIO()
-            writer = csv.writer(output)
-            writer.writerow(["Name", "Type", "Quantity"])
-            for med in meds:
-                writer.writerow([
-                    med["name"],
-                    med["type"] if "type" in med.keys() else "",
-                    med["quantity"]
-                ])
-            output.seek(0)
-            return send_file(io.BytesIO(output.getvalue().encode()), mimetype="text/csv", as_attachment=True, download_name="inventory_export.csv")
 
-        elif action == "export_patients":
-            db = get_patient_db()
-            rows = db.execute("SELECT * FROM patients").fetchall()
             output = io.StringIO()
             writer = csv.writer(output)
-            writer.writerow(["ID", "First Name", "Last Name", "D.O.B (MM/DD/YYYY)", "Address"])
-            for row in rows:
-                writer.writerow([row["id"], row["firstName"], row["lastName"], row["dob"], row["address"]])
+            writer.writerow(["Name", "Quantity"])
+            for med in meds:
+                writer.writerow([med["name"], med["quantity"]])
             output.seek(0)
-            return send_file(io.BytesIO(output.getvalue().encode()), mimetype="text/csv", as_attachment=True, download_name="patients_export.csv")
+
+            return send_file(
+                io.BytesIO(output.getvalue().encode()),
+                mimetype="text/csv",
+                as_attachment=True,
+                download_name="inventory_export.csv"
+            )
 
     return render_template("upload.html")
 
