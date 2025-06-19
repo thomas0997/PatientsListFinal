@@ -1,0 +1,131 @@
+{% extends "layout.html" %}
+
+{% block body %}
+<style>
+    .logo-header {
+        background-color: #7ABDE5;
+        padding: 10px;
+        text-align: left;
+    }
+
+    .logo-header img {
+        height: 60px;
+        width: auto;
+        margin-left: 5px;
+    }
+
+    h1 {
+        text-align: center;
+        font-family: -apple-system, 'SF Pro';
+        margin-top: 40px;
+        color: #7ABDE5;
+        text-shadow: 0px 0px 5px rgba(104, 143, 229, 0.5);
+    }
+
+    .form-wrapper {
+        display: flex;
+        justify-content: center;
+        margin-top: 20px;
+    }
+
+    form {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 12px;
+    }
+
+    input[type="text"], input[type="password"] {
+        width: 250px;
+        font-family: -apple-system, 'SF Pro';
+        border: 2px solid #7ABDE5;
+        border-radius: 6px;
+        padding: 8px;
+        background-color: transparent;
+        box-sizing: border-box;
+        font-size: 14px;
+    }
+
+    .button-row {
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+        width: 100%;
+        max-width: 250px;
+    }
+
+    button {
+        flex: 1;
+        font-family: -apple-system, 'SF Pro';
+        border: 2px solid #7ABDE5;
+        border-radius: 100px;
+        padding: 8px 16px;
+        font-size: 12px;
+        background-color: #7ABDE5;
+        color: white;
+        cursor: pointer;
+    }
+
+    button:hover {
+        background-color: #688FE5;
+        border-color: #688FE5;
+    }
+
+    ul.flash-messages {
+        list-style: none;
+        padding: 0;
+        text-align: center;
+        font-family: -apple-system, 'SF Pro';
+        margin-top: 20px;
+    }
+
+    ul.flash-messages li {
+        padding: 8px 12px;
+        margin-bottom: 10px;
+        border-radius: 6px;
+        width: fit-content;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    .flash-error {
+        background-color: #ffcccc;
+        color: #b30000;
+        border: 1px solid #ff8080;
+    }
+
+    .flash-success {
+        background-color: #d4f4dd;
+        color: #157347;
+        border: 1px solid #6bcf8b;
+    }
+</style>
+
+<div class="logo-header">
+    <img src="{{ url_for('static', filename='AURON.png') }}" alt="Logo">
+</div>
+
+<h1>Login</h1>
+
+<div class="form-wrapper">
+    <form method="post" autocomplete="off">
+        <input type="text" name="username" placeholder="Username" required>
+        <input type="password" name="password" placeholder="Password" required>
+
+        <div class="button-row">
+            <button type="submit">Log in</button>
+            <button type="button" onclick="window.location.href='/reg1'">Register</button>
+        </div>
+    </form>
+</div>
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    <ul class="flash-messages">
+      {% for category, message in messages %}
+        <li class="flash-{{ 'error' if category == 'error' else 'success' }}">{{ message }}</li>
+      {% endfor %}
+    </ul>
+  {% endif %}
+{% endwith %}
+{% endblock %}

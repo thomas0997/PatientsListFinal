@@ -1,0 +1,127 @@
+{% extends "layout.html" %}
+{% block body %}
+<style>
+    .logo-header {
+        background-color: #7ABDE5;
+        padding: 10px;
+        text-align: left;
+    }
+
+    .logo-header img {
+        height: 60px;
+        width: auto;
+        margin-left: 5px;
+    }
+
+    h1 {
+        text-align: center;
+        font-family: -apple-system, 'SF Pro';
+        margin-top: 40px;
+        color: #7ABDE5;
+        text-shadow: 0px 0px 5px rgba(104, 143, 229, 0.5);
+    }
+
+    .form-wrapper {
+        display: flex;
+        justify-content: center;
+        margin-top: 30px;
+    }
+
+    form {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 14px;
+        background-color: #f9f9f9;
+        padding: 30px;
+        border-radius: 12px;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+
+    input[type="text"], input[type="password"] {
+        width: 260px;
+        font-family: -apple-system, 'SF Pro';
+        border: 2px solid #7ABDE5;
+        border-radius: 6px;
+        padding: 10px;
+        background-color: transparent;
+        box-sizing: border-box;
+        font-size: 14px;
+    }
+
+    .button-row {
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+        width: 100%;
+        max-width: 240px;
+    }
+
+    button {
+        flex: 1;
+        font-family: -apple-system, 'SF Pro';
+        border: 2px solid #7ABDE5;
+        border-radius: 100px;
+        padding: 10px 20px;
+        font-size: 14px;
+        background-color: #7ABDE5;
+        color: white;
+        cursor: pointer;
+    }
+
+    button:hover {
+        background-color: #688FE5;
+        border-color: #688FE5;
+    }
+
+    .message-list {
+        text-align: center;
+        color: red;
+        font-family: -apple-system, 'SF Pro';
+        margin-top: 20px;
+    }
+
+    .back-link {
+        display: block;
+        text-align: center;
+        margin-top: 20px;
+        font-family: -apple-system, 'SF Pro';
+        text-decoration: none;
+        color: #7ABDE5;
+        font-weight: bold;
+    }
+
+    .back-link:hover {
+        color: #688FE5;
+    }
+</style>
+
+<div class="logo-header">
+    <img src="{{ url_for('static', filename='AURON.png') }}" alt="Logo">
+</div>
+
+<h1>Register New User</h1>
+
+<div class="form-wrapper">
+    <form method="post" autocomplete="off">
+        <input name="username" type="text" placeholder="Username" required>
+        <input name="password" type="password" placeholder="Password" required>
+
+        <div class="button-row">
+            <button type="submit">Register</button>
+        </div>
+    </form>
+</div>
+
+{% with messages = get_flashed_messages() %}
+  {% if messages %}
+    <ul class="message-list">
+      {% for message in messages %}
+        <li>{{ message }}</li>
+      {% endfor %}
+    </ul>
+  {% endif %}
+{% endwith %}
+
+<a href="/login" class="back-link">← Back to Login</a>
+{% endblock %}

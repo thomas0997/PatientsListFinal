@@ -97,9 +97,7 @@
 <h1>Inventory Logs</h1>
 
 <div class="container">
-<div class="container">
     <button type="button" onclick="window.location.href='/inventory'">Go Back</button>
-</div>
 
     {% if logs %}
     <form method="POST" action="/inventory/logs/clear" onsubmit="return confirm('Are you sure you want to delete all logs?');" style="display:inline;">
@@ -125,6 +123,7 @@
             <th>Medicine</th>
             <th>Change</th>
             <th>Timestamp</th>
+            <th>User</th>
         </tr>
     </thead>
     <tbody>
@@ -133,6 +132,7 @@
             <td>{{ log.medicine_name }}</td>
             <td class="{{ 'positive' if log.change > 0 else 'negative' }}">{{ log.change }}</td>
             <td>{{ log.timestamp }}</td>
+            <td>{{ log.user or "Unknown" }}</td>
         </tr>
         {% endfor %}
     </tbody>
