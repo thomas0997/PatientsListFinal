@@ -3,6 +3,7 @@ import sqlite3
 import os
 import io
 from datetime import datetime
+from functools import wraps
 from flask_session import Session
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask import Flask, render_template, request, redirect, flash, url_for, send_file, jsonify, session
@@ -15,6 +16,109 @@ app.config["SESSION_PERMANENT"] = False
 app.config["SESSION_TYPE"] = "filesystem"
 Session(app)
 
+#-- Upload
+
+# ---------- UPLOAD & EXPORT ----------
+@app.route("/upload", methods=["GET", "POST"])
+def upload_csv():
+    if request.method == "POST":
+        action = request.form.get("action")
+
+        if action == "upload_patients":
+            file = request.files.get("file")
+            if not file or file.filename == "":
+                flash("No file selected")
+                return redirect(request.url)
+
+            if not file.filename.endswith(".csv"):
+                flash("Please upload a CSV file")
+                return redirect(request.url)
+
+            try:
+                stream = io.StringIO(file.stream.read().decode("UTF8"))
+                reader = csv.DictReader(stream)
+
+                db = get_patient_db()
+                db.execute("DELETE FROM patients")
+                db.execute("DELETE FROM sqlite_sequence WHERE name='patients'")
+                db.commit()
+
+                for row in reader:
+                    db.execute(
+                        "INSERT INTO patients (firstName, lastName, dob, address) VALUES (?, ?, ?, ?)",
+                        (row["First Name"], row["Last Name"], row["D.O.B (MM/DD/YYYY)"], row["Address"])
+                    )
+                db.commit()
+                flash("✅ Patients CSV uploaded and database reset!")
+            except Exception as e:
+                flash(f"⚠️ Error uploading patients CSV: {e}")
+            return redirect(request.url)
+
+        elif action == "upload_inventory":
+            file = request.files.get("file")
+            if not file or file.filename == "":
+                flash("No file selected")
+                return redirect(request.url)
+
+            if not file.filename.endswith(".csv"):
+                flash("Please upload a CSV file")
+                return redirect(request.url)
+
+            try:
+                stream = io.StringIO(file.stream.read().decode("UTF8"))
+                reader = csv.DictReader(stream)
+
+                db = get_inventory_db()
+                db.execute("DELETE FROM medicines")
+                for row in reader:
+                    name = row["Name"]
+                    quantity = int(row["Quantity"])
+                    db.execute("INSERT INTO medicines (name, quantity) VALUES (?, ?)", (name, quantity))
+                db.commit()
+                flash("✅ Inventory CSV uploaded and database updated!")
+            except Exception as e:
+                flash(f"⚠️ Error uploading inventory CSV: {e}")
+            return redirect(request.url)
+
+        elif action == "export_inventory":
+            db = get_inventory_db()
+            meds = db.execute("SELECT * FROM medicines").fetchall()
+
+            output = io.StringIO()
+            writer = csv.writer(output)
+            writer.writerow(["Name", "Quantity"])
+            for med in meds:
+                writer.writerow([med["name"], med["quantity"]])
+            output.seek(0)
+
+            return send_file(
+                io.BytesIO(output.getvalue().encode()),
+                mimetype="text/csv",
+                as_attachment=True,
+                download_name="inventory_export.csv"
+            )
+
+        elif action == "export_patients":
+            db = get_patient_db()
+            patients = db.execute("SELECT * FROM patients").fetchall()
+
+            output = io.StringIO()
+            writer = csv.writer(output)
+            writer.writerow(["ID", "First Name", "Last Name", "D.O.B (MM/DD/YYYY)", "Address"])
+            for p in patients:
+                writer.writerow([p["id"], p["firstName"], p["lastName"], p["dob"], p["address"]])
+            output.seek(0)
+
+            return send_file(
+                io.BytesIO(output.getvalue().encode()),
+                mimetype="text/csv",
+                as_attachment=True,
+                download_name="patients_export.csv"
+            )
+
+    return render_template("upload.html")
+
+
 # ---------- DATABASE ----------
 def get_patient_db():
     conn = sqlite3.connect(os.path.join(basedir, "patients.db"))
@@ -26,7 +130,16 @@ def get_inventory_db():
     conn.row_factory = sqlite3.Row
     return conn
 
-# ---------- FORCE LOGOUT ON FIRST REQUEST ----------
+# ---------- LOGIN REQUIRED DECORATOR ----------
+def login_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if "name" not in session:
+            return redirect("/login")
+        return f(*args, **kwargs)
+    return decorated_function
+
+# ---------- FORCE LOGOUT ON FIRST VISIT ----------
 @app.before_request
 def force_logout_on_visit():
     if request.endpoint == "index":
@@ -86,20 +199,22 @@ def index():
     return redirect("/login")
 
 @app.route("/index")
+@login_required
 def main_dashboard():
-    if "name" not in session:
-        return redirect("/login")
     return render_template("index.html", name=session["name"])
 
 @app.route("/add", methods=["GET", "POST"])
+@login_required
 def add():
     return render_template("add.html")
 
 @app.route("/patients")
+@login_required
 def patients_home():
     return render_template("patientslist.html")
 
 @app.route("/search")
+@login_required
 def search():
     db = get_patient_db()
     query = request.args.get("query")
@@ -113,6 +228,7 @@ def search():
     return render_template("search.html", patients=patients, searched=bool(query))
 
 @app.route("/register", methods=["POST"])
+@login_required
 def register():
     db = get_patient_db()
     first = request.form.get("firstName")
@@ -128,12 +244,14 @@ def register():
     return render_template("success.html")
 
 @app.route("/results")
+@login_required
 def results():
     db = get_patient_db()
     patients = db.execute("SELECT * FROM patients").fetchall()
     return render_template("find.html", patients=patients)
 
 @app.route("/remove/<int:id>", methods=["POST"])
+@login_required
 def remove(id):
     db = get_patient_db()
     db.execute("DELETE FROM patients WHERE id = ?", (id,))
@@ -141,6 +259,7 @@ def remove(id):
     return redirect("/search")
 
 @app.route("/view")
+@login_required
 def view():
     db = get_patient_db()
     patients = db.execute("SELECT * FROM patients").fetchall()
@@ -148,10 +267,12 @@ def view():
 
 # ---------- INVENTORY ----------
 @app.route("/inventory")
+@login_required
 def inventory_menu():
     return render_template("inventory/index.html")
 
 @app.route("/inventory/view")
+@login_required
 def inventory_view():
     sort = request.args.get("sort", "desc")
     order = "DESC" if sort == "desc" else "ASC"
@@ -160,12 +281,14 @@ def inventory_view():
     return render_template("inventory/view.html", meds=meds, sort=sort)
 
 @app.route("/inventory/logs")
+@login_required
 def inventory_logs():
     db = get_inventory_db()
     logs = db.execute("SELECT * FROM logs ORDER BY id DESC").fetchall()
     return render_template("inventory/logs.html", logs=logs)
 
 @app.route("/inventory/logs/clear", methods=["POST"])
+@login_required
 def clear_inventory_logs():
     db = get_inventory_db()
     db.execute("DELETE FROM logs")
@@ -174,6 +297,7 @@ def clear_inventory_logs():
     return redirect("/inventory/logs")
 
 @app.route("/inventory/add", methods=["GET", "POST"])
+@login_required
 def add_medicine():
     if request.method == "POST":
         name = request.form.get("name")
@@ -190,6 +314,7 @@ def add_medicine():
     return render_template("inventory/add.html")
 
 @app.route("/inventory/find", methods=["GET", "POST"])
+@login_required
 def inventory_find():
     meds = []
     searched = False
@@ -201,6 +326,7 @@ def inventory_find():
     return render_template("inventory/find.html", meds=meds, searched=searched)
 
 @app.route("/inventory/remove/<name>", methods=["POST"])
+@login_required
 def remove_medicine(name):
     db = get_inventory_db()
     db.execute("DELETE FROM medicines WHERE name = ?", (name,))
@@ -209,6 +335,7 @@ def remove_medicine(name):
     return redirect("/inventory/view")
 
 @app.route("/inventory/ajax-update/<name>", methods=["POST"])
+@login_required
 def ajax_update_quantity(name):
     data = request.get_json()
     action = data.get("action")
@@ -222,8 +349,8 @@ def ajax_update_quantity(name):
     db.execute("UPDATE medicines SET quantity = ? WHERE name = ?", (new_qty, name))
 
     username = session.get("name", "Unknown")
-
     today = datetime.now().date().isoformat()
+
     existing_log = db.execute(
         "SELECT id, change FROM logs WHERE medicine_name = ? AND date(timestamp) = ? ORDER BY id DESC LIMIT 1",
         (name, today)
