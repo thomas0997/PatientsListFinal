@@ -15,7 +15,6 @@ basedir = os.path.abspath(os.path.dirname(__file__))
 app.config["SESSION_PERMANENT"] = False
 app.config["SESSION_TYPE"] = "filesystem"
 Session(app)
-
 #-- Upload
 
 # ---------- UPLOAD & EXPORT ----------
@@ -118,6 +117,9 @@ def upload_csv():
 
     return render_template("upload.html")
 
+#-- Upload
+
+# ---------- UPLOAD & EXPORT ----------
 
 # ---------- DATABASE ----------
 def get_patient_db():
@@ -264,6 +266,26 @@ def view():
     db = get_patient_db()
     patients = db.execute("SELECT * FROM patients").fetchall()
     return render_template("view.html", patients=patients)
+
+@app.route("/edit/<int:id>", methods=["GET", "POST"])
+@login_required
+def edit_patient(id):
+    db = get_patient_db()
+    patient = db.execute("SELECT * FROM patients WHERE id = ?", (id,)).fetchone()
+
+    if request.method == "POST":
+        first = request.form.get("firstName")
+        last = request.form.get("lastName")
+        dob = request.form.get("dob")
+        address = request.form.get("address")
+
+        db.execute("UPDATE patients SET firstName = ?, lastName = ?, dob = ?, address = ? WHERE id = ?",
+                   (first, last, dob, address, id))
+        db.commit()
+        flash("✅ Patient info updated!")
+        return redirect("/view")
+
+    return render_template("edit.html", patient=patient)
 
 # ---------- INVENTORY ----------
 @app.route("/inventory")

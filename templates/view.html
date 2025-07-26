@@ -97,6 +97,9 @@
             <td>{{ patient.lastName }}</td>
             <td>{{ patient.dob }}</td>
             <td>{{ patient.address }}</td>
+            <td><a href="/edit/{{ patient.id }}"><button>Edit</button></a></td>
+
+
         </tr>
         {% endfor %}
     </tbody>

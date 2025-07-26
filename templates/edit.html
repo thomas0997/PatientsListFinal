@@ -1,0 +1,12 @@
+{% extends "layout.html" %}
+{% block body %}
+<h2 style="text-align:center;">Edit Patient</h2>
+<form method="POST" style="max-width:400px;margin:auto;">
+    <input name="firstName" value="{{ patient.firstName }}" required>
+    <input name="lastName" value="{{ patient.lastName }}" required>
+    <input name="dob" value="{{ patient.dob }}" required>
+    <input name="address" value="{{ patient.address }}">
+    <button type="submit">Save</button>
+    <a href="/view"><button type="button">Cancel</button></a>
+</form>
+{% endblock %}
