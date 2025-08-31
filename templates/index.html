@@ -2,41 +2,47 @@
 
 {% block body %}
 <style>
-    .logo-header {
-        background-color: #7ABDE5;
-        padding: 10px;
-        text-align: left;
+
+    body {
+        margin: 0;
+        padding: 0;
+        min-height: 100vh;
+        background: linear-gradient(to top, #6B1D79, #10142E);
+        font-family: -apple-system, 'SF Pro', sans-serif;
     }
 
     .logo-header img {
         height: 60px;
         width: auto;
-        margin-left: 5px;
+        margin-left: 30px;
+        margin-top: 30px;
     }
 
     h1 {
         text-align: center;
         font-family: -apple-system, 'SF Pro';
-        margin-top: 60px;
-        color: #7ABDE5;
+        margin-top: 100px;
+        color: white;
         text-shadow: 0px 0px 5px rgba(104, 143, 229, 0.5);
+        font-size: 80px;
+    }
+    h2 {
+        text-align: center;
+        font-family: -apple-system, 'SF Pro';
+        font-weight: normal;
+        margin-top: -30px;
+        color: white;
+        font-size: 40px;
     }
 
     .main-menu {
         display: flex;
         justify-content: center;
         gap: 60px;
-        margin-top: 60px;
+        margin-top: 120px;
         flex-wrap: wrap;
     }
 
-    .menu-item {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        text-align: center;
-        font-family: -apple-system, 'SF Pro';
-    }
 
     .menu-button {
         width: 160px;
@@ -60,41 +66,361 @@
     }
 
     .menu-button:hover {
-        transform: scale(1.05);
+        transform: scale(1.09);
+    }
+    .top-nav {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 20px 30px;
+        position: absolute;
+        top: 0;
+        width: 100%;
+        box-sizing: border-box;
+        z-index: 10;
     }
 
-    .menu-label {
-        margin-top: 10px;
-        font-size: 14px;
-        font-weight: bold;
-        color: #7ABDE5;
-        font-family: -apple-system, 'SF Pro';
+    .left-nav {
+        display: flex;
+        align-items: center;
+        gap: 15px;
     }
 
-    .main-menu a {
+    .left-nav img {
+        height: 50px;
+    }
+
+    .left-nav a {
+        color: white;
         text-decoration: none;
+        font-family: -apple-system, 'SF Pro', sans-serif;
+        font-weight: normal;
+        font-size: 18px;
+    }
+
+    .right-nav img {
+        height: 40px;
+        width: 40px;
+        border-radius: 50%;
+        cursor: pointer;
+        object-fit: cover;
+    }
+.auron-icon {
+  position: absolute;
+  bottom: 20px;       /* place it 20px from bottom of login-box */
+  left: 50%;          /* center horizontally */
+  transform: translateX(-50%);
+  width: 170px;       /* smaller width */
+  height: 150px;
+  z-index: 2;
+}
+
+.auron-icon img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.top-nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 30px;
+    position: absolute;
+    top: 0;
+    width: 100%;
+    box-sizing: border-box;
+    z-index: 10;
+    }
+
+    .left-nav {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    }
+
+    .left-nav img {
+    height: 50px;
+    }
+
+    .left-nav a {
+    color: white;
+    text-decoration: none;
+    font-family: -apple-system, 'SF Pro', sans-serif;
+    font-weight: normal;
+    font-size: 18px;
+    }
+.right-nav {
+    display: flex;
+    align-items: center;
+    gap: 15px; /* adds space between Home and Profile */
+}
+
+.nav-home-wrapper {
+    display: flex;
+    align-items: flex-start; /* You can adjust this: center, flex-end, etc. */
+    margin-top: 4px; /* Controls vertical alignment of Home */
+}
+
+.nav-home {
+    color: white;
+    text-decoration: none;
+    font-family: -apple-system, 'SF Pro', sans-serif;
+    font-weight: normal;
+    font-size: 18px;
+    margin-right: 50px;
+}
+
+.nav-profile-wrapper {
+    display: flex;
+    align-items: center;
+}
+
+.nav-profile-wrapper img {
+    height: 40px;
+    width: 40px;
+    border-radius: 50%;
+    cursor: pointer;
+    object-fit: cover;
+
+    /* ← Add these to move the icon */
+    margin-top: 0px;    /* Move down */
+    margin-bottom: -3px;/* Move up */
+    margin-left: 10px;  /* Move right */
+    margin-right: 30px; /* Move left */
+
+    /* Or use transform if you want finer control */
+    /* transform: translate(10px, -5px); */  /* Right 10px, Up 5px */
+}
+#logout-button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    width: 100%;
+    text-align: center;
+    padding: 0;
+}
+
+#logout-button img {
+    height: 120px;
+    width: 120px;
+    object-fit: contain;   /* Prevents stretching */
+    display: block;
+    margin: 20px auto;
+}
+#profile-gradient {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 11vw;
+    height: 100vh;
+    background: linear-gradient(to top, #641D74, black, black);
+    opacity: 0.9;
+    z-index: 5;
+    transform: translateX(100%);
+    transition: transform 0.4s ease-in-out, opacity 0.4s ease-in-out;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    align-items: center;
+    padding-bottom: 30px;
+}
+
+#profile-gradient.active {
+    transform: translateX(0);
+}
+
+@keyframes slideInRight {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+#logout-button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+}
+
+    @media (max-width: 768px) {
+        h1 {
+            font-size: 40px;
+            margin-top: 60px;
+        }
+
+        h2 {
+            font-size: 24px;
+            margin-top: -10px;
+        }
+
+        .main-menu {
+            gap: 30px;
+            margin-top: 60px;
+        }
+
+        .menu-button {
+            width: 120px;
+            height: 120px;
+        }
+
+        .top-nav {
+            flex-direction: column;
+            align-items: flex-start;
+            padding: 10px 20px;
+            position: static;
+        }
+
+        .nav-home-wrapper,
+        .nav-profile-wrapper {
+            margin: 5px 0;
+        }
+        .nav-home-wrapper {
+            transform: translateY(-40px);
+        }
+        .nav-profile-wrapper {
+            transform: translateY(-40px);
+        }
+
+        .auron-icon {
+            position: fixed;
+            bottom: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 120px;
+            height: auto;
+            z-index: 2;
+        }
+
+        .nav-home {
+            font-size: 16px;
+            margin-right: 20px;
+        }
+
+        .right-nav img,
+        .nav-profile-wrapper img {
+            height: 32px;
+            width: 32px;
+            margin-right: 15px;
+        }
+
+        #logout-button img {
+            height: 100px;
+            width: 100px;
+            display: block;
+            margin: 0 auto;
+        }
+
+        #profile-gradient {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            width: 100%;
+            height: auto;
+            justify-content: flex-start;
+            min-height: 80px;
+            padding: 20px 30px;
+            text-align: center;
+            transform: translateY(-100%);
+            transition: transform 0.4s ease-in-out, opacity 0.4s ease-in-out;
+        }
+
+        /* Right align right-nav contents on mobile */
+        .right-nav {
+            width: 100%;
+            justify-content: flex-end;
+        }
+
+        /* Hide profile-gradient by default and show only when active */
+        #profile-gradient {
+            display: none;
+        }
+        #profile-gradient.active {
+            display: flex;
+            transform: translateY(0);
+            animation: slideDown 0.4s ease-in-out forwards;
+        }
+        .left-nav img {
+            margin-top: 20px;
+        }
+        @keyframes slideDown {
+            from {
+                transform: translateY(-100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
     }
 </style>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const profileIcon = document.querySelector('.nav-profile-wrapper img');
+        const gradient = document.getElementById('profile-gradient');
 
-<div class="logo-header">
-    <img src="{{ url_for('static', filename='AURON.png') }}" alt="Logo">
+        profileIcon.addEventListener('click', function () {
+            gradient.classList.toggle('active');
+        });
+    });
+</script>
+
+<div class="top-nav">
+    <div class="left-nav">
+    <a href="/reg1">
+        <img src="{{ url_for('static', filename='HeaderIcon.png') }}" alt="Logo">
+    </a></div>
+    <div class="right-nav">
+        <div class="nav-home-wrapper">
+            <a href="/index" class="nav-home">Home</a>
+        </div>
+        <div class="nav-profile-wrapper">
+            <img src="{{ url_for('static', filename='ProfileIcon.png') }}" alt="Profile Icon">
+        </div>
+    </div>
 </div>
-
-<h1>Welcome, {{ name }}! This is Dra. Franco's Clinic</h1>
+<h1>Welcome, {{ name }}!</h1>
+<h2> This is Dra. Franco's Clinic!</h2>
 
 <div class="main-menu">
     <a href="/patients" class="menu-item">
         <button class="menu-button">
-            <img src="{{ url_for('static', filename='Person.png') }}" alt="Patients">
+            <img src="{{ url_for('static', filename='PatientsIcon.png') }}" alt="Patients">
         </button>
-        <div class="menu-label">Patients</div>
+
+
     </a>
 
     <a href="/inventory" class="menu-item">
         <button class="menu-button">
-            <img src="{{ url_for('static', filename='Inventory.png') }}" alt="Inventory">
+            <img src="{{ url_for('static', filename='InventoryIcon.png') }}" alt="Inventory">
         </button>
-        <div class="menu-label">Inventory</div>
     </a>
+
+
+<div style="width: 100%; text-align: center; margin-top: 30px;">
+    <p style="color: white; font-size: 20px;">
+        Total Patients: {{ patient_count }}
+    </p>
+</div>
+</div>
+
+     <div class="auron-icon">
+    <img src="{{ url_for('static', filename='ProducedIcon.png') }}" alt="Produced by Auron Inc.">
+   </div>
+<div id="profile-gradient">
+    <form action="/login" method="get">
+        <button id="logout-button" type="submit">
+            <img src="{{ url_for('static', filename='LogOutButton.png') }}" alt="Logout">
+        </button>
+    </form>
+</div>
 </div>
 {% endblock %}

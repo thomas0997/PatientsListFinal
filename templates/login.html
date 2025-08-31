@@ -2,130 +2,228 @@
 
 {% block body %}
 <style>
-    .logo-header {
-        background-color: #7ABDE5;
-        padding: 10px;
-        text-align: left;
-    }
+    html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-weight: normal;
+  }
+  .login-page {
+    background: url("{{ url_for('static', filename='Background.jpeg') }}") no-repeat center center fixed;
+    background-size: cover;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding-top: 10px;
+    position: relative;
+    z-index: 0;
+  }
 
-    .logo-header img {
-        height: 60px;
-        width: auto;
-        margin-left: 5px;
-    }
+  .white-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: white; /* fully opaque */
+  z-index: 0;
+}
 
-    h1 {
-        text-align: center;
-        font-family: -apple-system, 'SF Pro';
-        margin-top: 40px;
-        color: #7ABDE5;
-        text-shadow: 0px 0px 5px rgba(104, 143, 229, 0.5);
-    }
+ .logo-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+  .logo-header img {
+    height: 220px;
+    width: auto;
 
-    .form-wrapper {
-        display: flex;
-        justify-content: center;
-        margin-top: 20px;
-    }
+  }
+    .white-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgb(185, 185, 185); /* fully opaque */
+    z-index: 0;
+    opacity: 70%;
+  }
 
-    form {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 12px;
-    }
+  .login-box {
+    background: linear-gradient(to top, #6B1D79, #10142E);
+    padding: 10px 200px 300px;
+    border-radius: 50px;
+    box-shadow: 0px 8px 30px rgba(0, 0, 0, 0.15);
+    width: 100%;
+    max-width: 980px;
+    position: relative;
+    z-index:  1;
+  }
 
-    input[type="text"], input[type="password"] {
-        width: 250px;
-        font-family: -apple-system, 'SF Pro';
-        border: 2px solid #7ABDE5;
-        border-radius: 6px;
-        padding: 8px;
-        background-color: transparent;
-        box-sizing: border-box;
-        font-size: 14px;
-    }
+.form-wrapper form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 50px; /* 👈 Push inputs down */
+}
 
-    .button-row {
-        display: flex;
-        justify-content: center;
-        gap: 10px;
-        width: 100%;
-        max-width: 250px;
-    }
+  .form-wrapper input {
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid white;
+  padding: 10px 5px;
+  color: white;
+  font-size: 14px;
+  outline: none;
+}
 
-    button {
-        flex: 1;
-        font-family: -apple-system, 'SF Pro';
-        border: 2px solid #7ABDE5;
-        border-radius: 100px;
-        padding: 8px 16px;
-        font-size: 12px;
-        background-color: #7ABDE5;
-        color: white;
-        cursor: pointer;
-    }
+.form-wrapper input::placeholder {
+  color: white;
+  opacity: 0.7;
+}
 
-    button:hover {
-        background-color: #688FE5;
-        border-color: #688FE5;
-    }
+.form-wrapper button {
+  background-color: white;
+  color: #641D74;              /* Set font color */
+  border: none;
+  padding: 10px 0px;          /* Top-bottom: 10px, Left-right: 20px */
+  border-radius: 100px;         /* Rounded corners */
+  font-size: 25px;
+  font-weight: bold;           /* Bold text */
+  font-family: 'Poppins', sans-serif;  /* Use Poppins */
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  width: 30%;
+  margin: 0 auto;
+}
+.form-wrapper button:hover {
+  background-color: #B703D9; /* Darker shade on hover */
+}
+.button-row button {
+  margin: 0 10px;  /* Adds 10px space to left and right of each button */
+}
+  .button-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+  }
 
-    ul.flash-messages {
-        list-style: none;
-        padding: 0;
-        text-align: center;
-        font-family: -apple-system, 'SF Pro';
-        margin-top: 20px;
-    }
+  ul {
+    text-align: center;
+    color: red;
+    font-family: sans-serif;
+  }
+  .input-with-icon {
+  display: flex;
+  align-items: center;
+  border-bottom: 2px solid white;
+  margin-bottom: 16px;
+  padding: 5px 0;
+}
 
-    ul.flash-messages li {
-        padding: 8px 12px;
-        margin-bottom: 10px;
-        border-radius: 6px;
-        width: fit-content;
-        margin-left: auto;
-        margin-right: auto;
-    }
+.input-with-icon img {
+  width: 20px;
+  height: 20px;
+  margin-right: 10px;
+  filter: brightness(0) invert(1); /* make dark icons appear white */
+}
 
-    .flash-error {
-        background-color: #ffcccc;
-        color: #b30000;
-        border: 1px solid #ff8080;
-    }
+.input-with-icon input {
+  background: transparent;
+  border: none;
+  outline: none;
+  color: white;
+  font-size: 14px;
+  width: 100%;
 
-    .flash-success {
-        background-color: #d4f4dd;
-        color: #157347;
-        border: 1px solid #6bcf8b;
-    }
+}
+
+.input-with-icon input::placeholder {
+  color: white;
+  opacity: 0.7;
+}
+h3{
+  font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-weight: normal;
+  color: white;
+  font-size: 10px;
+  text-align: center;
+  opacity: 80%;
+  line-height: 1.5;
+  margin-top: -5px;
+}
+h1{
+  font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  color: white;
+  font-weight: bold;
+  text-align: center;
+  margin-top: -5px; /* Move it upwards */
+  font-size: 24px;   /* Optional: adjust font size */
+}
+.auron-icon {
+  position: absolute;
+  bottom: 20px;       /* place it 20px from bottom of login-box */
+  left: 50%;          /* center horizontally */
+  transform: translateX(-50%);
+  width: 170px;       /* smaller width */
+  height: 150px;
+  z-index: 2;
+}
+
+.auron-icon img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
 </style>
 
-<div class="logo-header">
-    <img src="{{ url_for('static', filename='AURON.png') }}" alt="Logo">
-</div>
+<div class="login-page">
+  <div class="white-overlay"></div>
 
-<h1>Login</h1>
 
-<div class="form-wrapper">
-    <form method="post" autocomplete="off">
-        <input type="text" name="username" placeholder="Username" required>
-        <input type="password" name="password" placeholder="Password" required>
-
-        <div class="button-row">
-            <button type="submit">Log in</button>
-            <button type="button" onclick="window.location.href='/reg1'">Register</button>
+  <div class="login-box">
+    <div class="form-wrapper">
+      <form method="post" autocomplete="off">
+              <div class="logo-header">
+            <img src="{{ url_for('static', filename='HeaderIcon.png') }}" alt="Logo">
+                <h1>LOG IN</h1>
+          </div>
+        <div class="input-with-icon">
+          <img src="{{ url_for('static', filename='LogInIcon.png') }}" alt="User Icon">
+          <input type="text" name="username" placeholder="Username" required>
         </div>
-    </form>
-</div>
 
-{% with messages = get_flashed_messages(with_categories=true) %}
-  {% if messages %}
-    <ul class="flash-messages">
-      {% for category, message in messages %}
-        <li class="flash-{{ 'error' if category == 'error' else 'success' }}">{{ message }}</li>
-      {% endfor %}
-    </ul>
-  {% endif %}
-{% endwith %}
+        <div class="input-with-icon">
+          <img src="{{ url_for('static', filename='PasswordIcon.png') }}" alt="Password Icon">
+          <input type="password" name="password" placeholder="Password" required>
+        </div>
+        <h3>
+          New? <br>
+          Contact Admin to Sign Up.
+        </h3>
+        <button type="submit" class="login-icon-button">Log In</button>
+      </form>
+    </div>
+   <div class="auron-icon">
+    <img src="{{ url_for('static', filename='ProducedIcon.png') }}" alt="Produced by Auron Inc.">
+   </div>
+
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        <ul>
+          {% for message in messages %}
+            <li>{{ message }}</li>
+          {% endfor %}
+        </ul>
+      {% endif %}
+    {% endwith %}
+  </div>
+</div>
 {% endblock %}
